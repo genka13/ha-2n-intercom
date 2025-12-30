@@ -1,0 +1,40 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "host": "[%key:common::config_flow::data::host%]",
+          "username": "[%key:common::config_flow::data::username%]",
+          "password": "[%key:common::config_flow::data::password%]",
+          "auth_method": "Authentication method",
+          "use_https": "Use HTTPS",
+          "verify_ssl": "Verify SSL certificate"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
+      "unknown": "[%key:common::config_flow::error::unknown%]"
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
+      "not_2n_device": "Discovered device does not appear to be a 2N intercom."
+    },
+    "flow_title": "{name}"
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "rtsp_stream": "RTSP stream",
+          "rtsp_port": "RTSP port",
+          "door_release_switch": "Door release switch #",
+          "pulse_rex_seconds": "REX pulse (seconds)",
+          "pulse_silent_alarm_seconds": "Silent alarm pulse (seconds)",
+          "pulse_invalid_credential_seconds": "Invalid credential pulse (seconds)"
+        }
+      }
+    }
+  }
+}

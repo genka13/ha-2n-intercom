@@ -1,0 +1,40 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Device is already configured",
+      "not_2n_device": "Discovered device does not appear to be a 2N intercom."
+    },
+    "error": {
+      "cannot_connect": "Failed to connect",
+      "invalid_auth": "Invalid authentication",
+      "unknown": "Unexpected error"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "host": "Host",
+          "password": "Password",
+          "username": "Username",
+          "auth_method": "Authentication method",
+          "use_https": "Use HTTPS",
+          "verify_ssl": "Verify SSL certificate"
+        }
+      }
+    },
+    "flow_title": "{name}"
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "rtsp_stream": "RTSP stream",
+          "rtsp_port": "RTSP port",
+          "door_release_switch": "Door release switch #",
+          "pulse_rex_seconds": "REX pulse (seconds)",
+          "pulse_silent_alarm_seconds": "Silent alarm pulse (seconds)",
+          "pulse_invalid_credential_seconds": "Invalid credential pulse (seconds)"
+        }
+      }
+    }
+  }
+}

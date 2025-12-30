@@ -1,0 +1,39 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Gerät ist bereits konfiguriert"
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen",
+      "invalid_auth": "Ungültige Authentifizierung",
+      "unknown": "Unerwarteter Fehler"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "host": "Host",
+          "username": "Benutzername",
+          "password": "Passwort",
+          "auth_method": "Authentifizierungsmethode",
+          "use_https": "HTTPS verwenden",
+          "verify_ssl": "SSL-Zertifikat prüfen"
+        }
+      }
+    },
+    "flow_title": "{name}"
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "rtsp_stream": "RTSP-Stream",
+          "rtsp_port": "RTSP-Port",
+          "door_release_switch": "Türöffner-Schalter Nr.",
+          "pulse_rex_seconds": "REX-Puls (Sekunden)",
+          "pulse_silent_alarm_seconds": "Stiller Alarm Puls (Sekunden)",
+          "pulse_invalid_credential_seconds": "Ungültiges Credential Puls (Sekunden)"
+        }
+      }
+    }
+  }
+}

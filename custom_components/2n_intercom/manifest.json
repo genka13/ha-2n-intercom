@@ -1,0 +1,22 @@
+{
+  "domain": "2n_intercom",
+  "name": "2N Intercom",
+  "codeowners": ["@genka13"],
+  "config_flow": true,
+  "dependencies": [
+    "stream"
+  ],
+  "documentation": "https://github.com/genka13/ha-2n-Intercom",
+  "iot_class": "local_polling",
+  "quality_scale": "bronze",
+  "requirements": [],
+  "ssdp": [],
+  "version": "0.1.24",
+  "zeroconf": [],
+  "dhcp": [
+    {
+      "macaddress": "7C1EB3*"
+    }
+  ],
+  "issue_tracker": "https://github.com/genka13/ha-2n-Intercom/issues"
+}
