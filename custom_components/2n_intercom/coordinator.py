@@ -1,4 +1,7 @@
-"""Data update coordinator for 2N Intercom."""
+"""Data update coordinator for 2N Intercom.
+
+All HTTP communication is performed by the external py2n-intercom library.
+"""
 
 from __future__ import annotations
 
@@ -8,16 +11,16 @@ import logging
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .api import TwoNApiError, TwoNClient
+from .api import Py2NApiError, Py2NClient
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class TwoNCoordinator(DataUpdateCoordinator[dict]):
+class Py2NCoordinator(DataUpdateCoordinator[dict]):
     """Coordinator that periodically polls switch status."""
 
-    def __init__(self, hass: HomeAssistant, client: TwoNClient) -> None:
+    def __init__(self, hass: HomeAssistant, client: Py2NClient) -> None:
         super().__init__(
             hass,
             _LOGGER,
@@ -38,5 +41,5 @@ class TwoNCoordinator(DataUpdateCoordinator[dict]):
                     continue
                 by_id[sid] = item
             return {"switches": by_id}
-        except TwoNApiError as err:
+        except Py2NApiError as err:
             raise UpdateFailed(str(err)) from err

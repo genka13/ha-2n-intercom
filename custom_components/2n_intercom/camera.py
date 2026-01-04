@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from urllib.parse import quote
+
 from homeassistant.components.camera import Camera, CameraEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
@@ -14,19 +16,19 @@ from aiohttp import web
 
 from homeassistant.helpers.aiohttp_client import async_aiohttp_proxy_stream
 
-from . import TwoNConfigEntry
+from . import Py2NConfigEntry
 from .const import CONF_RTSP_STREAM, DEFAULT_RTSP_STREAM, CONF_RTSP_PORT, DEFAULT_RTSP_PORT
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: TwoNConfigEntry,
+    entry: Py2NConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    async_add_entities([TwoNSnapshotCamera(entry)])
+    async_add_entities([Py2NSnapshotCamera(entry)])
 
 
-class TwoNSnapshotCamera(Camera):
+class Py2NSnapshotCamera(Camera):
     """A snapshot camera entity backed by /api/camera/snapshot."""
 
     _attr_has_entity_name = True

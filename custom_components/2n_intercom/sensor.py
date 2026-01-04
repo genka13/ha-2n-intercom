@@ -12,31 +12,31 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.entity import EntityCategory
 
-from . import TwoNConfigEntry
-from .events import TwoNEventState, signal_log_event
+from . import Py2NConfigEntry
+from .events import Py2NEventState, signal_log_event
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: TwoNConfigEntry,
+    entry: Py2NConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up sensors for a config entry."""
-    state: TwoNEventState = entry.runtime_data.event_state
+    state: Py2NEventState = entry.runtime_data.event_state
 
     async_add_entities(
         [
-            TwoNActivitySensor(entry, state),
-            TwoNLastEventSensor(entry, state),
+            Py2NActivitySensor(entry, state),
+            Py2NLastEventSensor(entry, state),
         ]
     )
 
 
-class _TwoNSensorBase(SensorEntity):
+class _Py2NSensorBase(SensorEntity):
     _attr_has_entity_name = True
     _attr_should_poll = False
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState) -> None:
         self._entry = entry
         self._state = state
 
@@ -85,12 +85,12 @@ class _TwoNSensorBase(SensorEntity):
         self.async_write_ha_state()
 
 
-class TwoNActivitySensor(_TwoNSensorBase):
+class Py2NActivitySensor(_Py2NSensorBase):
     """High-level activity based mainly on call state."""
 
     _attr_icon = "mdi:account-voice"
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState) -> None:
         super().__init__(entry, state)
         self._attr_unique_id = f"{entry.entry_id}_activity"
         self._attr_entity_registry_enabled_default = self._supported("CallStateChanged")
@@ -118,12 +118,12 @@ class TwoNActivitySensor(_TwoNSensorBase):
         return attrs
 
 
-class TwoNLastEventSensor(_TwoNSensorBase):
+class Py2NLastEventSensor(_Py2NSensorBase):
     """Expose the last seen raw event type (diagnostics)."""
 
     _attr_icon = "mdi:timeline-alert-outline"
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState) -> None:
         super().__init__(entry, state)
         self._attr_unique_id = f"{entry.entry_id}_last_event"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC

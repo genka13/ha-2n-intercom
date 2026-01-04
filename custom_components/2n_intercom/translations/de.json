@@ -1,7 +1,8 @@
 {
   "config": {
     "abort": {
-      "already_configured": "Gerät ist bereits konfiguriert"
+      "already_configured": "Gerät ist bereits konfiguriert",
+      "not_2n_device": "Das gefundene Gerät scheint kein 2N Intercom zu sein."
     },
     "error": {
       "cannot_connect": "Verbindung fehlgeschlagen",

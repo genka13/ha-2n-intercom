@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from homeassistant.exceptions import ConfigEntryNotReady, ConfigEntryAuthFailed
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
@@ -11,7 +12,7 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 
-from .api import TwoNApiError, TwoNClient, TwoNDeviceInfo
+from .api import Py2NApiError, Py2NClient, Py2NDeviceInfo
 from .const import (
     AUTH_METHOD_DIGEST,
     CONF_AUTH_METHOD,
@@ -23,33 +24,33 @@ from .const import (
     DOMAIN,
     PLATFORMS,
 )
-from .coordinator import TwoNCoordinator
-from .events import TwoNEventManager, TwoNEventState
+from .coordinator import Py2NCoordinator
+from .events import Py2NEventManager, Py2NEventState
 from .models import SwitchCaps
 
 _HA_PLATFORMS: list[Platform] = [Platform(p) for p in PLATFORMS]
 
 
 @dataclass(slots=True)
-class TwoNRuntimeData:
+class Py2NRuntimeData:
     """Runtime data stored on the config entry."""
 
-    client: TwoNClient
-    coordinator: TwoNCoordinator
-    device_info: TwoNDeviceInfo
+    client: Py2NClient
+    coordinator: Py2NCoordinator
+    device_info: Py2NDeviceInfo
     switch_caps: list[SwitchCaps]
 
-    # Logging capabilities (/api/log/caps)
+    # Logging capabilities (fetched via py2n-intercom; underlying endpoint: /api/log/caps)
     log_caps: set[str]
     event_filter: list[str]
 
     # Long-poll event subsystem
-    event_state: TwoNEventState
-    event_manager: TwoNEventManager
+    event_state: Py2NEventState
+    event_manager: Py2NEventManager
     device_id: str
 
 
-TwoNConfigEntry = ConfigEntry[TwoNRuntimeData]
+Py2NConfigEntry = ConfigEntry[Py2NRuntimeData]
 
 
 async def _async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -58,7 +59,7 @@ async def _async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None
 
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: TwoNConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: Py2NConfigEntry) -> bool:
     """Set up 2N Intercom from a config entry."""
 
     session = async_get_clientsession(hass)
@@ -70,7 +71,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TwoNConfigEntry) -> bool
     verify_ssl: bool = entry.data.get(CONF_VERIFY_SSL, DEFAULT_VERIFY_SSL)
     auth_method: str = entry.data.get(CONF_AUTH_METHOD, AUTH_METHOD_DIGEST)
 
-    client = TwoNClient(
+    client = Py2NClient(
         session=session,
         host=host,
         username=username,
@@ -81,9 +82,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: TwoNConfigEntry) -> bool
     )
 
     # Identify device + read switch capabilities.
-    device_info = await client.async_get_device_info()
-    caps_raw = await client.async_get_switch_caps()
-
+    try:
+        device_info = await client.async_get_device_info()
+    except Py2NApiError as err:
+        if getattr(err, 'is_unauthorized', False) or str(err).lower() in ('unauthorized', 'forbidden'):
+            raise ConfigEntryAuthFailed from err
+        raise
+    try:
+        caps_raw = await client.async_get_switch_caps()
+    except Py2NApiError as err:
+        if getattr(err, 'is_unauthorized', False) or str(err).lower() in ('unauthorized', 'forbidden'):
+            raise ConfigEntryAuthFailed from err
+        raise
     switch_caps: list[SwitchCaps] = []
     for item in caps_raw:
         try:
@@ -105,7 +115,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TwoNConfigEntry) -> bool
     try:
         log_caps_list = await client.async_get_log_caps()
         log_caps = {e for e in log_caps_list if isinstance(e, str) and e}
-    except TwoNApiError:
+    except Py2NApiError:
         # If caps is unavailable, we fall back to our default filter.
         log_caps = set()
 
@@ -114,7 +124,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TwoNConfigEntry) -> bool
         # Only subscribe to events supported by this device.
         event_filter = [e for e in DEFAULT_EVENT_FILTER if e in log_caps]
 
-    coordinator = TwoNCoordinator(hass, client)
+    coordinator = Py2NCoordinator(hass, client)
     await coordinator.async_config_entry_first_refresh()
 
     # Register the device to get a stable Home Assistant device_id for bus events.
@@ -137,13 +147,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: TwoNConfigEntry) -> bool
         manufacturer="2N",
         name=device_info.title,
         model=device_info.model,
+        model_id=getattr(device_info, "model_id", None),
         sw_version=device_info.sw_version,
         hw_version=device_info.hw_version,
         serial_number=device_info.serial,
+        configuration_url=f"https://{host}",
     )
 
-    event_state = TwoNEventState()
-    event_manager = TwoNEventManager(
+    event_state = Py2NEventState()
+    event_manager = Py2NEventManager(
         hass=hass,
         entry_id=entry.entry_id,
         client=client,
@@ -153,7 +165,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TwoNConfigEntry) -> bool
         event_filter=event_filter,
     )
 
-    entry.runtime_data = TwoNRuntimeData(
+    entry.runtime_data = Py2NRuntimeData(
         client=client,
         coordinator=coordinator,
         device_info=device_info,
@@ -174,7 +186,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TwoNConfigEntry) -> bool
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: TwoNConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: Py2NConfigEntry) -> bool:
     """Unload a config entry."""
 
     try:

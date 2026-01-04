@@ -9,7 +9,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import TwoNConfigEntry
+from . import Py2NConfigEntry
 from .const import (
     CONF_PULSE_REX,
     DEFAULT_PULSE_REX,
@@ -18,34 +18,34 @@ from .const import (
     CONF_PULSE_INVALID_CREDENTIAL,
     DEFAULT_PULSE_INVALID_CREDENTIAL,
 )
-from .events import TwoNEventState, signal_log_event
+from .events import Py2NEventState, signal_log_event
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: TwoNConfigEntry,
+    entry: Py2NConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up binary sensors for a config entry."""
-    state: TwoNEventState = entry.runtime_data.event_state
+    state: Py2NEventState = entry.runtime_data.event_state
 
     async_add_entities(
         [
-            TwoNMotionBinarySensor(entry, state),
-            TwoNNoiseBinarySensor(entry, state),
-            TwoNDoorBinarySensor(entry, state),
-            TwoNInvalidCredentialBinarySensor(entry, state),
-            TwoNRexBinarySensor(entry, state),
-            TwoNSilentAlarmBinarySensor(entry, state),
+            Py2NMotionBinarySensor(entry, state),
+            Py2NNoiseBinarySensor(entry, state),
+            Py2NDoorBinarySensor(entry, state),
+            Py2NInvalidCredentialBinarySensor(entry, state),
+            Py2NRexBinarySensor(entry, state),
+            Py2NSilentAlarmBinarySensor(entry, state),
         ]
     )
 
 
-class _TwoNBinarySensorBase(BinarySensorEntity):
+class _Py2NBinarySensorBase(BinarySensorEntity):
     _attr_has_entity_name = True
     _attr_should_poll = False
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState) -> None:
         self._entry = entry
         self._state = state
 
@@ -96,10 +96,10 @@ class _TwoNBinarySensorBase(BinarySensorEntity):
 
 
 
-class _TwoNMomentaryBinarySensorBase(_TwoNBinarySensorBase):
+class _Py2NMomentaryBinarySensorBase(_Py2NBinarySensorBase):
     """Binary sensor that turns on for a short time when an event is received."""
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState, pulse_seconds: int = 5) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState, pulse_seconds: int = 5) -> None:
         super().__init__(entry, state)
         self._pulse_seconds = pulse_seconds
         self._is_on = False
@@ -148,11 +148,11 @@ class _TwoNMomentaryBinarySensorBase(_TwoNBinarySensorBase):
         self.async_write_ha_state()
 
 
-class TwoNMotionBinarySensor(_TwoNBinarySensorBase):
+class Py2NMotionBinarySensor(_Py2NBinarySensorBase):
     _attr_device_class = BinarySensorDeviceClass.MOTION
     _attr_icon = "mdi:motion-sensor"
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState) -> None:
         super().__init__(entry, state)
         self._attr_unique_id = f"{entry.entry_id}_motion"
         self._attr_entity_registry_enabled_default = self._supported("MotionDetected")
@@ -166,11 +166,11 @@ class TwoNMotionBinarySensor(_TwoNBinarySensorBase):
         return bool(self._state.motion)
 
 
-class TwoNNoiseBinarySensor(_TwoNBinarySensorBase):
+class Py2NNoiseBinarySensor(_Py2NBinarySensorBase):
     _attr_device_class = BinarySensorDeviceClass.SOUND
     _attr_icon = "mdi:microphone"
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState) -> None:
         super().__init__(entry, state)
         self._attr_unique_id = f"{entry.entry_id}_noise"
         self._attr_entity_registry_enabled_default = self._supported("NoiseDetected")
@@ -184,11 +184,11 @@ class TwoNNoiseBinarySensor(_TwoNBinarySensorBase):
         return bool(self._state.noise)
 
 
-class TwoNDoorBinarySensor(_TwoNBinarySensorBase):
+class Py2NDoorBinarySensor(_Py2NBinarySensorBase):
     _attr_device_class = BinarySensorDeviceClass.DOOR
     _attr_icon = "mdi:door"
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState) -> None:
         super().__init__(entry, state)
         self._attr_unique_id = f"{entry.entry_id}_door"
         self._attr_entity_registry_enabled_default = self._supported("DoorStateChanged")
@@ -202,13 +202,13 @@ class TwoNDoorBinarySensor(_TwoNBinarySensorBase):
         return bool(self._state.door_open)
 
 
-class TwoNInvalidCredentialBinarySensor(_TwoNMomentaryBinarySensorBase):
+class Py2NInvalidCredentialBinarySensor(_Py2NMomentaryBinarySensorBase):
     """Turns on briefly when an invalid credential is entered."""
 
     _attr_device_class = BinarySensorDeviceClass.PROBLEM
     _attr_icon = "mdi:alert-circle-outline"
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState) -> None:
         super().__init__(entry, state, pulse_seconds=int(entry.options.get(CONF_PULSE_INVALID_CREDENTIAL, DEFAULT_PULSE_INVALID_CREDENTIAL)))
         self._attr_unique_id = f"{entry.entry_id}_invalid_credential"
         self._attr_entity_registry_enabled_default = (
@@ -232,13 +232,13 @@ class TwoNInvalidCredentialBinarySensor(_TwoNMomentaryBinarySensorBase):
                 self._pulse(event)
 
 
-class TwoNRexBinarySensor(_TwoNMomentaryBinarySensorBase):
+class Py2NRexBinarySensor(_Py2NMomentaryBinarySensorBase):
     """Request-to-exit activated."""
 
     _attr_device_class = BinarySensorDeviceClass.OPENING
     _attr_icon = "mdi:door-open"
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState) -> None:
         super().__init__(entry, state, pulse_seconds=int(entry.options.get(CONF_PULSE_REX, DEFAULT_PULSE_REX)))
         self._attr_unique_id = f"{entry.entry_id}_rex"
         self._attr_entity_registry_enabled_default = self._supported("RexActivated")
@@ -253,13 +253,13 @@ class TwoNRexBinarySensor(_TwoNMomentaryBinarySensorBase):
             self._pulse(event)
 
 
-class TwoNSilentAlarmBinarySensor(_TwoNMomentaryBinarySensorBase):
+class Py2NSilentAlarmBinarySensor(_Py2NMomentaryBinarySensorBase):
     """Silent alarm."""
 
     _attr_device_class = BinarySensorDeviceClass.PROBLEM
     _attr_icon = "mdi:alarm-light-outline"
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState) -> None:
         super().__init__(entry, state, pulse_seconds=int(entry.options.get(CONF_PULSE_SILENT_ALARM, DEFAULT_PULSE_SILENT_ALARM)))
         self._attr_unique_id = f"{entry.entry_id}_silent_alarm"
         self._attr_entity_registry_enabled_default = self._supported("SilentAlarm")

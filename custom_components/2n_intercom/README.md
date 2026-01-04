@@ -6,6 +6,14 @@ It is based on real devices and the `/api/*` endpoints available on firmware **2
 
 ## Supported devices / firmware
 
+The integration creates a Home Assistant device and stores:
+- **Model**: `variant` (e.g. *2N IP Style*)
+- **Model ID**: `devType` from `/api/system/info`
+- **Serial**: `serialNumber`
+- **MAC**: `macAddr`
+- **Configuration URL**: `https://<device-ip>`
+
+
 Tested and intended for:
 
 - **2N IP Style**
@@ -149,3 +157,8 @@ Momentary (“pulse”) binary sensors:
 ---
 
 **Disclaimer**: This is a community / custom integration and is not affiliated with 2N / Axis Communications.
+
+
+## Python library
+
+This integration depends on the external PyPI library `py2n-intercom`.

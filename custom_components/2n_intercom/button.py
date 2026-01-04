@@ -10,7 +10,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 
-from . import TwoNConfigEntry
+from . import Py2NConfigEntry
 from .const import CONF_DOOR_RELEASE_SWITCH, DEFAULT_DOOR_RELEASE_SWITCH
 
 _LOGGER = logging.getLogger(__name__)
@@ -18,15 +18,15 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: TwoNConfigEntry,
+    entry: Py2NConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up button entities."""
     client = entry.runtime_data.client
-    async_add_entities([TwoNDoorReleaseButton(entry, client)])
+    async_add_entities([Py2NDoorReleaseButton(entry, client)])
 
 
-class TwoNDoorReleaseButton(ButtonEntity):
+class Py2NDoorReleaseButton(ButtonEntity):
     """Door release button.
 
     Uses Switch 1 trigger by convention (typical door release relay).
@@ -37,7 +37,7 @@ class TwoNDoorReleaseButton(ButtonEntity):
     _attr_has_entity_name = True
     _attr_suggested_object_id = "door_release"
 
-    def __init__(self, entry: TwoNConfigEntry, client) -> None:
+    def __init__(self, entry: Py2NConfigEntry, client) -> None:
         self._entry = entry
         self._client = client
         self._attr_unique_id = f"{entry.entry_id}_door_release"

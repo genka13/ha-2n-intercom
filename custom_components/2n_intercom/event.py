@@ -11,8 +11,8 @@ from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import TwoNConfigEntry
-from .events import TwoNEventState, signal_log_event
+from . import Py2NConfigEntry
+from .events import Py2NEventState, signal_log_event
 
 INVALID_MAP = {
     "CardEntered": "CardEnteredInvalid",
@@ -23,26 +23,26 @@ INVALID_MAP = {
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: TwoNConfigEntry,
+    entry: Py2NConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up event entities for a config entry."""
-    state: TwoNEventState = entry.runtime_data.event_state
+    state: Py2NEventState = entry.runtime_data.event_state
 
     async_add_entities(
         [
-            TwoNRexEvent(entry, state),
-            TwoNSilentAlarmEvent(entry, state),
-            TwoNInvalidCredentialEvent(entry, state),
+            Py2NRexEvent(entry, state),
+            Py2NSilentAlarmEvent(entry, state),
+            Py2NInvalidCredentialEvent(entry, state),
         ]
     )
 
 
-class _TwoNEventBase(EventEntity):
+class _Py2NEventBase(EventEntity):
     _attr_has_entity_name = True
     _attr_should_poll = False
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState) -> None:
         self._entry = entry
         self._state = state
 
@@ -92,12 +92,12 @@ class _TwoNEventBase(EventEntity):
         return
 
 
-class TwoNRexEvent(_TwoNEventBase):
+class Py2NRexEvent(_Py2NEventBase):
     """REX activation (exit button)."""
 
     _attr_icon = "mdi:exit-run"
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState) -> None:
         super().__init__(entry, state)
         self._attr_unique_id = f"{entry.entry_id}_rex"
         self._attr_event_types = ["activated"]
@@ -114,12 +114,12 @@ class TwoNRexEvent(_TwoNEventBase):
         self._trigger_event("activated", {"params": event.get("params"), "id": event.get("id"), "utcTime": event.get("utcTime")})
 
 
-class TwoNSilentAlarmEvent(_TwoNEventBase):
+class Py2NSilentAlarmEvent(_Py2NEventBase):
     """Silent alarm."""
 
     _attr_icon = "mdi:alarm-light-outline"
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState) -> None:
         super().__init__(entry, state)
         self._attr_unique_id = f"{entry.entry_id}_silent_alarm"
         self._attr_event_types = ["triggered"]
@@ -136,12 +136,12 @@ class TwoNSilentAlarmEvent(_TwoNEventBase):
         self._trigger_event("triggered", {"params": event.get("params"), "id": event.get("id"), "utcTime": event.get("utcTime")})
 
 
-class TwoNInvalidCredentialEvent(_TwoNEventBase):
+class Py2NInvalidCredentialEvent(_Py2NEventBase):
     """Invalid credential attempts (card/code/mobkey)."""
 
     _attr_icon = "mdi:alert-octagon-outline"
 
-    def __init__(self, entry: TwoNConfigEntry, state: TwoNEventState) -> None:
+    def __init__(self, entry: Py2NConfigEntry, state: Py2NEventState) -> None:
         super().__init__(entry, state)
         self._attr_unique_id = f"{entry.entry_id}_invalid_credential"
         self._attr_event_types = [

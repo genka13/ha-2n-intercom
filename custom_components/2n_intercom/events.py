@@ -1,4 +1,7 @@
-"""Event listener for 2N Intercom via /api/log/* endpoints."""
+"""Event listener for 2N Intercom (long-poll).
+
+Underlying HTTP calls to /api/log/* are handled by the external py2n-intercom library.
+"""
 
 from __future__ import annotations
 
@@ -10,13 +13,13 @@ from typing import Any
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 
-from .api import TwoNApiError, TwoNClient
+from .api import Py2NApiError, Py2NClient
 from .const import (
     DEFAULT_EVENT_CHANNEL_DURATION,
     DEFAULT_EVENT_PULL_TIMEOUT,
     DOMAIN,
 )
-from .coordinator import TwoNCoordinator
+from .coordinator import Py2NCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,7 +30,7 @@ def signal_log_event(entry_id: str) -> str:
 
 
 @dataclass(slots=True)
-class TwoNEventState:
+class Py2NEventState:
     """In-memory state derived from event log messages."""
 
     motion: bool = False
@@ -63,7 +66,7 @@ def _to_bool(value: Any) -> bool | None:
     return None
 
 
-class TwoNEventManager:
+class Py2NEventManager:
     """Maintain a long-poll subscription channel and dispatch events."""
 
     def __init__(
@@ -71,9 +74,9 @@ class TwoNEventManager:
         *,
         hass: HomeAssistant,
         entry_id: str,
-        client: TwoNClient,
-        coordinator: TwoNCoordinator,
-        event_state: TwoNEventState,
+        client: Py2NClient,
+        coordinator: Py2NCoordinator,
+        event_state: Py2NEventState,
         device_id: str,
         event_filter: list[str],
     ) -> None:
@@ -120,7 +123,7 @@ class TwoNEventManager:
         self._channel_id = None
         try:
             await self._client.async_log_unsubscribe(cid)
-        except TwoNApiError:
+        except Py2NApiError:
             # Channel may already be gone; ignore.
             return
 
@@ -141,7 +144,7 @@ class TwoNEventManager:
 
                 except asyncio.CancelledError:
                     raise
-                except TwoNApiError as err:
+                except Py2NApiError as err:
                     _LOGGER.debug("2N event listener error: %s", err)
                     await self._close_channel()
                     await asyncio.sleep(backoff)

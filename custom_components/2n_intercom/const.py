@@ -18,19 +18,8 @@ AUTH_METHOD_DIGEST = "digest"
 AUTH_METHOD_BASIC = "basic"
 
 # 2N HTTP API endpoints
-API_SYSTEM_INFO = "/api/system/info"
-API_SWITCH_CAPS = "/api/switch/caps"
-API_SWITCH_STATUS = "/api/switch/status"
-API_SWITCH_CTRL = "/api/switch/ctrl"
-
-API_CAMERA_CAPS = "/api/camera/caps"
-API_CAMERA_SNAPSHOT = "/api/camera/snapshot"
 
 # Event logging (long-poll)
-API_LOG_CAPS = "/api/log/caps"
-API_LOG_SUBSCRIBE = "/api/log/subscribe"
-API_LOG_PULL = "/api/log/pull"
-API_LOG_UNSUBSCRIBE = "/api/log/unsubscribe"
 
 # Event defaults
 DEFAULT_EVENT_PULL_TIMEOUT = 25  # seconds
@@ -71,4 +60,3 @@ DEFAULT_PULSE_SILENT_ALARM = 30
 
 CONF_PULSE_INVALID_CREDENTIAL = "pulse_invalid_credential_seconds"
 DEFAULT_PULSE_INVALID_CREDENTIAL = 10
-

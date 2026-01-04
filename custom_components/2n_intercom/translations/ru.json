@@ -1,0 +1,40 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Устройство уже настроено",
+      "not_2n_device": "Обнаруженное устройство не похоже на домофон 2N."
+    },
+    "error": {
+      "cannot_connect": "Не удалось подключиться",
+      "invalid_auth": "Неверные учетные данные",
+      "unknown": "Неожиданная ошибка"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "host": "Host",
+          "username": "Имя пользователя",
+          "password": "Пароль",
+          "auth_method": "Метод аутентификации",
+          "use_https": "Использовать HTTPS",
+          "verify_ssl": "Проверять SSL-сертификат"
+        }
+      }
+    },
+    "flow_title": "{name}"
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "rtsp_stream": "RTSP поток",
+          "rtsp_port": "Порт RTSP",
+          "door_release_switch": "Реле открытия двери №",
+          "pulse_rex_seconds": "Импульс REX (сек.)",
+          "pulse_silent_alarm_seconds": "Импульс тихой тревоги (сек.)",
+          "pulse_invalid_credential_seconds": "Импульс неверного доступа (сек.)"
+        }
+      }
+    }
+  }
+}

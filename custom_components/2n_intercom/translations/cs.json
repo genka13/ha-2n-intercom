@@ -1,0 +1,40 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Zařízení je již nastaveno",
+      "not_2n_device": "Zjištěné zařízení nevypadá jako interkom 2N."
+    },
+    "error": {
+      "cannot_connect": "Nepodařilo se připojit",
+      "invalid_auth": "Neplatné ověření",
+      "unknown": "Neočekávaná chyba"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "host": "Host",
+          "username": "Uživatelské jméno",
+          "password": "Heslo",
+          "auth_method": "Metoda ověření",
+          "use_https": "Použít HTTPS",
+          "verify_ssl": "Ověřit SSL certifikát"
+        }
+      }
+    },
+    "flow_title": "{name}"
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "rtsp_stream": "RTSP stream",
+          "rtsp_port": "Port RTSP",
+          "door_release_switch": "Spínač otevření dveří č.",
+          "pulse_rex_seconds": "Impuls REX (sekundy)",
+          "pulse_silent_alarm_seconds": "Impuls tichého alarmu (sekundy)",
+          "pulse_invalid_credential_seconds": "Impuls neplatného přístupu (sekundy)"
+        }
+      }
+    }
+  }
+}

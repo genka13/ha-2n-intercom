@@ -15,8 +15,10 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/genka13/ha-2n-Intercom/issues",
   "quality_scale": "bronze",
-  "requirements": [],
+  "requirements": [
+    "py2n-intercom==0.1.33"
+  ],
   "ssdp": [],
-  "version": "0.1.24",
+  "version": "0.1.33",
   "zeroconf": []
 }

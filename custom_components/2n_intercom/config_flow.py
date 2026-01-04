@@ -16,7 +16,7 @@ from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
 
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import TwoNApiError, TwoNClient
+from .api import Py2NApiError, Py2NClient
 from .const import (
     CONF_RTSP_STREAM,
     DEFAULT_RTSP_STREAM,
@@ -76,7 +76,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
 
     auth_method = data.get(CONF_AUTH_METHOD, AUTH_METHOD_DIGEST)
 
-    client = TwoNClient(
+    client = Py2NClient(
         session=session,
         host=data[CONF_HOST],
         username=data[CONF_USERNAME],
@@ -88,8 +88,10 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
 
     try:
         info = await client.async_get_device_info()
-    except TwoNApiError as err:
-        if str(err).lower() in {"unauthorized", "401", "auth"}:
+        # Ensure credentials are actually valid (some firmware exposes system info without auth).
+        await client.async_get_switch_caps()
+    except Py2NApiError as err:
+        if getattr(err, 'is_unauthorized', False) or str(err).lower() in {'unauthorized', 'forbidden'}:
             raise InvalidAuth from err
         raise CannotConnect from err
 
@@ -164,7 +166,7 @@ class ConfigFlow(ConfigFlow, domain=DOMAIN):
     @staticmethod
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
         """Return the options flow handler."""
-        return TwoNOptionsFlowHandler(config_entry)
+        return Py2NOptionsFlowHandler(config_entry)
 
 class CannotConnect(HomeAssistantError):
     """Error to indicate we cannot connect."""
@@ -174,7 +176,7 @@ class InvalidAuth(HomeAssistantError):
     """Error to indicate there is invalid auth."""
 
 
-class TwoNOptionsFlowHandler(OptionsFlow):
+class Py2NOptionsFlowHandler(OptionsFlow):
     """Handle options for 2N Intercom."""
 
     def __init__(self, config_entry: ConfigEntry) -> None:
@@ -203,7 +205,7 @@ class TwoNOptionsFlowHandler(OptionsFlow):
         # Fallback: query the device directly (best-effort).
         try:
             from homeassistant.helpers.aiohttp_client import async_get_clientsession
-            from .api import TwoNClient
+            from .api import Py2NClient
             from .const import (
                 AUTH_METHOD_DIGEST,
                 CONF_AUTH_METHOD,
@@ -221,7 +223,7 @@ class TwoNOptionsFlowHandler(OptionsFlow):
             verify_ssl: bool = self._entry.data.get(CONF_VERIFY_SSL, DEFAULT_VERIFY_SSL)
             auth_method: str = self._entry.data.get(CONF_AUTH_METHOD, AUTH_METHOD_DIGEST)
 
-            client = TwoNClient(
+            client = Py2NClient(
                 session=session,
                 host=host,
                 username=username,

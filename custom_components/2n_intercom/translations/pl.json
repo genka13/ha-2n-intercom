@@ -1,0 +1,40 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Urządzenie jest już skonfigurowane",
+      "not_2n_device": "Wykryte urządzenie nie wygląda na domofon 2N."
+    },
+    "error": {
+      "cannot_connect": "Nie można się połączyć",
+      "invalid_auth": "Nieprawidłowe uwierzytelnienie",
+      "unknown": "Nieoczekiwany błąd"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "host": "Host",
+          "username": "Nazwa użytkownika",
+          "password": "Hasło",
+          "auth_method": "Metoda uwierzytelniania",
+          "use_https": "Użyj HTTPS",
+          "verify_ssl": "Weryfikuj certyfikat SSL"
+        }
+      }
+    },
+    "flow_title": "{name}"
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "rtsp_stream": "Strumień RTSP",
+          "rtsp_port": "Port RTSP",
+          "door_release_switch": "Przekaźnik otwarcia drzwi nr",
+          "pulse_rex_seconds": "Impuls REX (sek.)",
+          "pulse_silent_alarm_seconds": "Impuls cichego alarmu (sek.)",
+          "pulse_invalid_credential_seconds": "Impuls nieprawidłowego dostępu (sek.)"
+        }
+      }
+    }
+  }
+}

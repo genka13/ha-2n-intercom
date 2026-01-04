@@ -13,13 +13,13 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 
-from . import TwoNConfigEntry
+from . import Py2NConfigEntry
 from .models import SwitchCaps
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: TwoNConfigEntry,
+    entry: Py2NConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     runtime = entry.runtime_data
@@ -27,14 +27,14 @@ async def async_setup_entry(
     coordinator = runtime.coordinator
     caps_list = runtime.switch_caps
 
-    entities: list[TwoNSwitch] = []
+    entities: list[Py2NSwitch] = []
     for caps in caps_list:
-        entities.append(TwoNSwitch(entry, client, coordinator, caps))
+        entities.append(Py2NSwitch(entry, client, coordinator, caps))
 
     async_add_entities(entities)
 
 
-class TwoNSwitch(CoordinatorEntity, SwitchEntity):
+class Py2NSwitch(CoordinatorEntity, SwitchEntity):
     """Representation of a 2N switch (relay)."""
 
     _attr_has_entity_name = True
